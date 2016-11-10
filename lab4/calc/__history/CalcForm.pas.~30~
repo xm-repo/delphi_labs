@@ -1,0 +1,64 @@
+unit CalcForm;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, stack;
+
+type
+  TMainForm = class(TForm)
+    ExpressionEdit: TEdit;
+    AnswerEdit: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    AnswerButton: TButton;
+    procedure AnswerButtonClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainForm: TMainForm;
+
+implementation
+
+{$R *.dfm}
+
+procedure TMainForm.AnswerButtonClick(Sender: TObject);
+var
+  tokens: TStringList;
+  i: integer;
+begin
+
+  stClear;
+  tokens := TStringList.Create;
+
+  AnswerEdit.Text := 'Некорректное выражение';
+
+  try
+    ExtractStrings([' '], [], PChar(ExpressionEdit.Text), tokens);
+    for i := 0 to tokens.Count - 1 do
+    begin
+      if (tokens.Strings[i] = '+') then
+        stPush(stPop + stPop)
+      else if (tokens.Strings[i] = '-') then
+        stPush(- stPop + stPop)
+      else if (tokens.Strings[i] = '*') then
+        stPush(stPop * stPop)
+      else
+        stPush(StrToInt(tokens.Strings[i]))
+    end;
+    if stCount = 1 then
+      AnswerEdit.Text := IntToStr(stPop);
+  except
+    //do nothing
+  end;
+
+  tokens.Free;
+
+end;
+
+end.

@@ -1,0 +1,39 @@
+program lab1;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils;
+
+var
+  i: integer;
+  sum: integer;
+begin
+
+  if (ParamCount = 0) or ((ParamCount = 1) and (ParamStr(1)= '/?')) then
+  begin
+    Writeln('sum x1 x2 x3 ... xn = x1+x2+x3+...+xn');
+  end
+  else
+  begin
+    sum := 0;
+    for i := 1 to ParamCount do
+    begin
+      try
+        sum:= sum + StrToInt(ParamStr(i));
+      except
+        Writeln(ParamStr(i), ' is not a valid integer value');
+      end;
+    end;
+    Writeln('sum = ', sum);
+  end;
+    
+end.
+
+{
+Чем отличаются консольные приложения от оконных?
+Как в Delphi получить полный путь к исполняемой программе?  ParamStr(0)
+Как в Delphi узнать количество переданный приложению параметров?  ParamCount
+Какой разделитель применяется в Windows для отделения параметров приложения друг от друга? пробеломы
+С какой целью в Delphi используется комментарий препроцессора $APPTYPE CONSOLE стандартный ввод-вывод
+}

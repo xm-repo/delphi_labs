@@ -1,0 +1,82 @@
+program lab21;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils, Windows;
+
+function CmdExec(const Cmd: string): Integer;
+// ¬ыполнение консольного приложени€ с ожиданием его завершени€ и возвратом кода возврата
+var
+  Rlst: LongBool;
+  StartUpInfo: TStartUpInfo;
+  ProcessInfo: TProcessInformation;
+  ExitCode: Cardinal;
+begin
+  FillChar(StartUpInfo, SizeOf(TStartUpInfo), 0); // заполнение структуры нул€ми
+  with StartUpInfo do
+  begin
+    cb := SizeOf(TStartUpInfo);
+    dwFlags := STARTF_USESHOWWINDOW or STARTF_FORCEONFEEDBACK;
+    wShowWindow := SW_SHOWNORMAL;
+  end; {with}
+  Rlst := CreateProcess(
+      nil,
+      PChar(Cmd), // команда
+      nil,
+      nil,
+      False, // флаг наследовани€ текущего процесса
+      NORMAL_PRIORITY_CLASS, // флаги способов создани€ процесса
+      nil,
+      nil, // текущий диск и каталог
+      StartUpInfo, // структура STARTUPINFO
+      ProcessInfo // структура PROCESS_INFORMATION
+    );
+  if Rlst then begin // если запуск прошел успешно
+    with ProcessInfo do begin
+      WaitForInputIdle(hProcess, INFINITE); // ждем завершени€ инициализации
+      WaitForSingleObject(ProcessInfo.hProcess, INFINITE); // ждем завершени€ процесса
+      GetExitCodeProcess(ProcessInfo.hProcess, ExitCode); // получаем код завершени€
+      CloseHandle(hThread); // закрываем дескриптор процесса
+      CloseHandle(hProcess); // закрываем дескриптор потока
+    end; {with}
+  end else begin // ошибка выполнени€ команды
+    WriteLn('Error: ', GetLastError, ' > ', Cmd);
+    ExitCode := 0;
+  end; {if}
+  Result := Integer(ExitCode); // возвращаем код возврата с приведением к типу Integer
+end; {func CmdExec}
+
+
+var
+  inFile, outFile : TextFile;
+  integers : string;
+begin
+
+  AssignFile(inFile, ParamStr(1));
+  Reset(inFile);
+
+  AssignFile(outFile, ParamStr(2));
+  Rewrite(outFile);
+
+  while not Eof(inFile) do
+  begin
+    Readln(inFile, integers);
+    Writeln(outFile, CmdExec('lab2.exe ' + integers));
+  end;
+
+  CloseFile(inFile);
+  CloseFile(outFile);
+
+  WinExec(PChar('notepad.exe ' + ParamStr(2)), SW_SHOWNORMAL);  
+
+end.
+
+{
+„то такое потоки ввода-вывода?
+ ак в консоли Windows организовать перенаправление потока вывода в файл? > >>
+ ак в консоли Windows организовать поток ввода из файла? <
+ ака€ процедура в Delphi позвол€ет завершить программу и передать указанный код возврата? Halt
+ ак получить значение кода возврата в консоли Windows? echo %errorlevel%
+ акие существуют способы запуска приложений из своей программы? Halt
+}

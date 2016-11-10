@@ -1,0 +1,27 @@
+program lab2;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils;
+
+var
+  i: integer;
+  mult: integer;
+begin
+
+  mult := 1;
+
+  for i := 1 to ParamCount do
+  begin
+    try
+      mult:= mult * StrToInt(ParamStr(i));
+    except
+      Writeln(ParamStr(i), ' is not a valid integer value');
+    end;
+  end;
+
+  Halt(mult);
+    
+end.
+

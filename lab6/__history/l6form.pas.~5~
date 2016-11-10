@@ -1,0 +1,59 @@
+unit l6form;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls;
+
+type
+  TLab6Form = class(TForm)
+    Lab6Timer: TTimer;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    CursorPositionLabel: TLabel;
+    WindowClassEdit: TEdit;
+    WindowTextEdit: TEdit;
+    procedure Lab6TimerTimer(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Lab6Form: TLab6Form;
+
+implementation
+
+{$R *.dfm}
+
+procedure TLab6Form.Lab6TimerTimer(Sender: TObject);
+var
+  CursorPosition: TPoint;
+  Wnd: HWND;
+  WinClass, WinText: PChar; 
+begin
+
+  GetCursorPos(CursorPosition);
+  CursorPositionLabel.Caption := IntToStr(CursorPosition.X) + ', ' + IntToStr(CursorPosition.Y);
+
+  Wnd := WindowFromPoint(CursorPosition);
+  GetMem(WinClass, 255); GetClassName(Wnd, WinClass, 255); WindowClassEdit.Text := WinClass;
+  GetMem(WinText, 255); GetWindowText(Wnd, WinText, 255); WindowTextEdit.Text := WinText;
+
+  Wnd := GetWindow(Wnd, GW_CHILD);
+  while Wnd <> 0 do begin
+    GetClassName(Wnd, WinClass, 255);
+    GetWindowText(Wnd, WinText, 255);
+    Wnd := GetWindow(Wnd, GW_HWNDNEXT);
+  end; {while}
+
+
+  FreeMem(WinClass, 255);
+  FreeMem(WinText, 255);
+
+end;
+
+end.

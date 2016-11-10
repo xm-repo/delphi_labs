@@ -1,0 +1,70 @@
+program lab21;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils, Windows;
+
+function CmdExec(const Cmd: string): Integer;
+// Выполнение консольного приложения с ожиданием его завершения и возвратом кода возврата
+var
+  Rlst: LongBool;
+  StartUpInfo: TStartUpInfo;
+  ProcessInfo: TProcessInformation;
+  ExitCode: Cardinal;
+begin
+  FillChar(StartUpInfo, SizeOf(TStartUpInfo), 0); // заполнение структуры нулями
+  with StartUpInfo do
+  begin
+    cb := SizeOf(TStartUpInfo);
+    dwFlags := STARTF_USESHOWWINDOW or STARTF_FORCEONFEEDBACK;
+    wShowWindow := SW_SHOWNORMAL;
+  end; {with}
+  Rlst := CreateProcess(
+      nil,
+      PChar(Cmd), // команда
+      nil,
+      nil,
+      False, // флаг наследования текущего процесса
+      NORMAL_PRIORITY_CLASS, // флаги способов создания процесса
+      nil,
+      nil, // текущий диск и каталог
+      StartUpInfo, // структура STARTUPINFO
+      ProcessInfo // структура PROCESS_INFORMATION
+    );
+  if Rlst then begin // если запуск прошел успешно
+    with ProcessInfo do begin
+      WaitForInputIdle(hProcess, INFINITE); // ждем завершения инициализации
+      WaitForSingleObject(ProcessInfo.hProcess, INFINITE); // ждем завершения процесса
+      GetExitCodeProcess(ProcessInfo.hProcess, ExitCode); // получаем код завершения
+      CloseHandle(hThread); // закрываем дескриптор процесса
+      CloseHandle(hProcess); // закрываем дескриптор потока
+    end; {with}
+  end else begin // ошибка выполнения команды
+    WriteLn('Error: ', GetLastError, ' > ', Cmd);
+    ExitCode := 0;
+  end; {if}
+  Result := Integer(ExitCode); // возвращаем код возврата с приведением к типу Integer
+end; {func CmdExec}
+
+
+var
+  inFile, outFile : TextFile;
+  integers : string;
+begin
+
+  AssignFile(inFile, ParamStr(1));
+  AssignFile(outFile, ParamStr(2));
+
+  while not Eof(inFile) do
+  begin
+    Readln(inFile, integers);
+    Writeln(outFile, CmdExec('lab2.exe ' + integers));
+  end;
+
+  CloseFile(inFile);
+  CloseFile(outFile);
+
+  WinExec(PChar('notepad.exe ' + outFile), SW_SHOWNORMAL);  
+
+end.

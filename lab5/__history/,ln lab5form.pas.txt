@@ -1,0 +1,121 @@
+unit lab5form;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls;
+
+type
+  TPluginsForm = class(TForm)
+    Label1: TLabel;
+    PluginsComboBox: TComboBox;
+    FunctionLabel: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    VariableEdit: TEdit;
+    AnswerEdit: TEdit;
+    CalcButton: TButton;
+    procedure PluginsComboBoxSelect(Sender: TObject);
+    procedure CalcButtonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    procedure DiscoverPlugins;
+  public
+    { Public declarations }
+  end;
+
+var
+  PluginsForm: TPluginsForm;
+
+type
+  StrFunc = function: PChar;
+  FloatFunc = function(x: real): real;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure TPluginsForm.DiscoverPlugins;
+var
+  F: TSearchRec;
+begin
+  if FindFirst('plugins/*.dll', faAnyFile, F) = 0 then begin
+    repeat
+      PluginsComboBox.Items.Add(StringReplace(F.Name, '.dll', '', [rfReplaceAll, rfIgnoreCase]));
+    until FindNext(F) <> 0;
+    FindClose(F);
+  end;
+  PluginsComboBox.ItemIndex := 0;
+  Self.PluginsComboBoxSelect(Self);
+end;
+
+procedure TPluginsForm.FormShow(Sender: TObject);
+begin
+  Self.DiscoverPlugins
+end;
+
+procedure TPluginsForm.CalcButtonClick(Sender: TObject);
+var
+  hDll: THandle;
+  DllFile: string;
+  PluginFloatFunc: FloatFunc;
+begin
+
+  DllFile := 'plugins/' + PluginsComboBox.Items[PluginsComboBox.ItemIndex] + '.dll';
+  hDll := LoadLibrary(PChar(DllFile));
+
+  if hDll = 0 then
+  begin
+    AnswerEdit.Text := 'Не удалось вычислить';
+    Exit;
+  end;
+
+  @PluginFloatFunc := GetProcAddress(HDLL, 'FloatFunc');
+
+  if @PluginFloatFunc = nil then
+  begin
+    AnswerEdit.Text := 'Не удалось вычислить';
+    Exit;
+  end;
+
+  try
+    AnswerEdit.Text := FloatToStr(PluginFloatFunc(StrToFloat(VariableEdit.Text)));
+  except
+    AnswerEdit.Text := 'Не удалось вычислить';
+  end;
+
+  FreeLibrary(HDLL);
+end;
+
+procedure TPluginsForm.PluginsComboBoxSelect(Sender: TObject);
+var
+  hDll: THandle;
+  DllFile: string;
+  PluginStrFunc: StrFunc;
+begin
+
+  DllFile := 'plugins/' + PluginsComboBox.Items[PluginsComboBox.ItemIndex] + '.dll';
+  hDll := LoadLibrary(PChar(DllFile));
+
+  if hDll = 0 then
+  begin
+    FunctionLabel.Caption := 'Не удалось загрузить ' + DllFile;
+    Exit;
+  end;
+
+  @PluginStrFunc := GetProcAddress(HDLL, 'StrFunc');
+
+  if @PluginStrFunc = nil then
+  begin
+    FunctionLabel.Caption := 'Ошибка в ' + DllFile;
+    Exit;
+  end;
+
+  FunctionLabel.Caption := PluginStrFunc;
+
+  FreeLibrary(HDLL);
+end;
+
+end.

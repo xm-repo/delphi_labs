@@ -1,0 +1,22 @@
+program lab2;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils;
+
+var
+  count, i, number, sum: Integer;
+begin
+  Read(count);
+
+  sum := 1;
+  for i := 1 to count do begin
+    Read(number);
+    Inc(Sum, A);
+  end;
+
+  Halt(Sum);
+
+end.
+

@@ -1,0 +1,15 @@
+unit stack;
+
+interface
+  function add(x, y: Integer): Integer;
+  function sub(x, y: Integer): Integer;
+
+implementation
+
+const
+  stackDll := 'stack.dll';
+
+function add; external stackDll;
+function sub; external stackDll;
+
+end.
