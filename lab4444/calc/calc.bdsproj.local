@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016.10.28 23:14:51.843.pas,C:\Documents and Settings\Администратор\Мои документы\Borland Studio Projects\Unit1.pas=F:\ППК\labs\lab4\calc\CalcForm.pas</Transaction>
+    <Transaction>2016.10.28 23:14:51.843.dfm,C:\Documents and Settings\Администратор\Мои документы\Borland Studio Projects\Unit1.dfm=F:\ППК\labs\lab4\calc\CalcForm.dfm</Transaction>
+    <Transaction>2016.10.28 23:14:57.750.bdsproj,C:\Documents and Settings\Администратор\Мои документы\Borland Studio Projects\Project1.bdsproj=F:\ППК\labs\lab4\calc\calc.bdsproj</Transaction>
+    <Transaction>2016.10.28 23:24:02.312.pas,F:\ППК\labs\lab4\calc\Unit1.pas=F:\ППК\labs\lab4\calc\stack.pas</Transaction>
+  </Transactions>
+</BorlandProject>

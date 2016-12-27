@@ -1,0 +1,23 @@
+unit stack;
+
+interface
+  function stEmpty: boolean;
+  procedure stPush(value: integer);
+  function stTop: integer;
+  function stPop: integer;
+  procedure stClear;
+  function stCount: integer;
+
+implementation
+
+const
+  stackDll = 'stack.dll';
+
+function stEmpty; external stackDll name 'empty';
+procedure stPush; external stackDll;
+function stTop; external stackDll;
+function stPop; external stackDll;
+procedure stClear; external stackDll;
+function stCount; external stackDll;
+
+end.
